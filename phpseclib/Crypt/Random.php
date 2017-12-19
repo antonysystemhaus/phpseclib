@@ -139,15 +139,14 @@ class Random
             session_cache_limiter('');
             session_start();
 
-            $v = $seed = $_SESSION['seed'] = pack('H*', sha1(
-                (isset($_SERVER) ? phpseclib_safe_serialize($_SERVER) : '') .
-                (isset($_POST) ? phpseclib_safe_serialize($_POST) : '') .
-                (isset($_GET) ? phpseclib_safe_serialize($_GET) : '') .
-                (isset($_COOKIE) ? phpseclib_safe_serialize($_COOKIE) : '') .
-                phpseclib_safe_serialize($GLOBALS) .
-                phpseclib_safe_serialize($_SESSION) .
-                phpseclib_safe_serialize($_OLD_SESSION)
-            ));
+            $v = (isset($GLOBALS['_SERVER']) ? self::safe_serialize($GLOBALS['_SERVER']) : '') .
+                 (isset($GLOBALS['_POST']) ? self::safe_serialize($GLOBALS['_POST']) : '') .
+                 (isset($GLOBALS['_GET']) ? self::safe_serialize($GLOBALS['_GET']) : '') .
+                 (isset($GLOBALS['_COOKIE']) ? self::safe_serialize($GLOBALS['_COOKIE']) : '') .
+                 self::safe_serialize($GLOBALS) .
+                 self::safe_serialize($_SESSION) .
+                 self::safe_serialize($_OLD_SESSION);
+            $v = $seed = $_SESSION['seed'] = sha1($v, true);
             if (!isset($_SESSION['count'])) {
                 $_SESSION['count'] = 0;
             }
